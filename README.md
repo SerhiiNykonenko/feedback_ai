@@ -13,7 +13,7 @@ Production-oriented feedback management system for software organizations.
 
 The Compose stack starts PostgreSQL, waits for it to become healthy, pushes the Prisma schema, seeds realistic data, and then starts the application.
 
-If antivirus HTTPS scanning replaces TLS certificates inside containers, export its public root CA to `docker/certs/avast-web-shield-root.pem`. The Compose build passes this file as a BuildKit secret; it is ignored by Git and is not stored in image layers.
+If antivirus HTTPS scanning replaces TLS certificates inside containers, export its public root CA and pass it to the build as the optional BuildKit secret named `local_ca`. The certificate is ignored by Git and is not stored in image layers.
 
 Useful commands:
 
