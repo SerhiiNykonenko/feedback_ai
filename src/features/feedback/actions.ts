@@ -34,8 +34,15 @@ const saveFeedbackDraftAction = createServerAction({
         .map((question) => [question.id, question])
     );
 
-    await prisma.$transaction(
-      input.answers.map((answer) => {
+    const answeredQuestionIds = input.answers.map((answer) => answer.questionId);
+    await prisma.$transaction([
+      prisma.answer.deleteMany({
+        where: {
+          feedbackId: input.feedbackId,
+          questionId: { notIn: answeredQuestionIds }
+        }
+      }),
+      ...input.answers.map((answer) => {
         const question = questions.get(answer.questionId);
         if (!question) throw new Error("Unknown question");
         const parsedType = questionTypeSchema.parse(question.type);
@@ -54,14 +61,13 @@ const saveFeedbackDraftAction = createServerAction({
           }
         });
       })
-    );
+    ]);
 
     const totalQuestions = questions.size || 1;
-    const savedCount = await prisma.answer.count({ where: { feedbackId: input.feedbackId } });
     const updated = await prisma.feedback.update({
       where: { id: input.feedbackId },
       data: {
-        progress: Math.min(100, Math.round((savedCount / totalQuestions) * 100)),
+        progress: Math.min(100, Math.round((input.answers.length / totalQuestions) * 100)),
         lastAutosavedAt: new Date()
       }
     });

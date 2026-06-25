@@ -2,7 +2,12 @@ import { z } from "zod";
 
 export const saveDraftSchema = z.object({
   feedbackId: z.string().min(1),
-  answers: z.array(z.object({ questionId: z.string().min(1), value: z.unknown() }))
+  answers: z
+    .array(z.object({ questionId: z.string().min(1), value: z.unknown() }))
+    .refine(
+      (answers) => new Set(answers.map((answer) => answer.questionId)).size === answers.length,
+      "Duplicate answers are not allowed"
+    )
 });
 
 export const submitFeedbackSchema = z.object({

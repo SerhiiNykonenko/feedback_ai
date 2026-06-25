@@ -79,6 +79,8 @@ const dictionaries = {
     submitFeedback: "Submit feedback",
     draftSaved: "Draft saved automatically",
     savingDraft: "Saving draft...",
+    draftPending: "Unsaved changes",
+    draftSaveFailed: "Draft could not be saved",
     complete: "complete",
     welcomeBack: "Welcome back",
     loginSubtitle: "Sign in to Feedback AI. Local demo accounts use Password123!.",
@@ -165,6 +167,8 @@ const dictionaries = {
     submitFeedback: "Надіслати відгук",
     draftSaved: "Чернетку збережено автоматично",
     savingDraft: "Збереження чернетки...",
+    draftPending: "Незбережені зміни",
+    draftSaveFailed: "Не вдалося зберегти чернетку",
     complete: "заповнено",
     welcomeBack: "З поверненням",
     loginSubtitle:

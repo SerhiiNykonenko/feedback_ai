@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useI18n } from "@/components/i18n-provider";
+import { calculateFeedbackProgress, completedAnswers } from "@/domain/feedback-answers";
 import { saveFeedbackDraft, submitFeedback } from "./actions";
 
 type FeedbackQuestion = {
@@ -46,64 +47,87 @@ export function FeedbackForm({
   const { t } = useI18n();
   const questions = useMemo(() => sections.flatMap((section) => section.questions), [sections]);
   const autosaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveQueue = useRef<Promise<unknown>>(Promise.resolve());
+  const mounted = useRef(true);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "dirty" | "saving" | "saved" | "error">(
+    Object.keys(initialAnswers).length > 0 ? "saved" : "idle"
+  );
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { answers: initialAnswers },
     mode: "onChange"
   });
 
-  const autosave = useMutation({
-    mutationFn: (values: FormValues) =>
-      saveFeedbackDraft({
-        feedbackId,
-        answers: Object.entries(values.answers)
-          .filter(([, value]) => {
-            if (typeof value === "string") return value.trim().length > 0;
-            if (Array.isArray(value)) return value.length > 0;
-            return typeof value === "number" ? !Number.isNaN(value) : typeof value === "boolean";
-          })
-          .map(([questionId, value]) => ({ questionId, value }))
-      })
-  });
+  const persistDraft = useCallback(
+    (values: FormValues) => {
+      if (mounted.current) setSaveStatus("saving");
+      const request = saveQueue.current.then(() =>
+        saveFeedbackDraft({
+          feedbackId,
+          answers: completedAnswers(values.answers, questions)
+        })
+      );
+      saveQueue.current = request.then(
+        () => undefined,
+        () => undefined
+      );
+      void request.then(
+        (result) => {
+          if (mounted.current) setSaveStatus(result.ok ? "saved" : "error");
+        },
+        () => {
+          if (mounted.current) setSaveStatus("error");
+        }
+      );
+      return request;
+    },
+    [feedbackId, questions]
+  );
 
   const submit = useMutation({
     mutationFn: async (values: FormValues) => {
-      const answers = Object.entries(values.answers)
-        .filter(([, value]) => {
-          if (typeof value === "string") return value.trim().length > 0;
-          if (Array.isArray(value)) return value.length > 0;
-          return typeof value === "number" ? !Number.isNaN(value) : typeof value === "boolean";
-        })
-        .map(([questionId, value]) => ({ questionId, value }));
-      const saved = await saveFeedbackDraft({ feedbackId, answers });
+      if (autosaveTimeout.current) clearTimeout(autosaveTimeout.current);
+      const saved = await persistDraft(values);
       if (!saved.ok) return saved;
       return submitFeedback({ feedbackId });
     }
   });
-  const autosaveMutate = autosave.mutate;
 
   useEffect(() => {
+    mounted.current = true;
     if (readOnly) return;
     const subscription = form.watch((values) => {
+      setSaveStatus("dirty");
       if (autosaveTimeout.current) clearTimeout(autosaveTimeout.current);
-      autosaveTimeout.current = setTimeout(() => autosaveMutate(values as FormValues), 800);
+      autosaveTimeout.current = setTimeout(() => {
+        void persistDraft(values as FormValues);
+      }, 500);
     });
     return () => {
+      mounted.current = false;
       if (autosaveTimeout.current) clearTimeout(autosaveTimeout.current);
       subscription.unsubscribe();
     };
-  }, [autosaveMutate, form, readOnly]);
+  }, [form, persistDraft, readOnly]);
 
-  const answered = Object.keys(form.watch("answers")).length;
-  const progress = questions.length ? Math.round((answered / questions.length) * 100) : 0;
+  const answers = form.watch("answers");
+  const progress = calculateFeedbackProgress(answers, questions);
+  const saveStatusLabel =
+    saveStatus === "saving"
+      ? t("savingDraft")
+      : saveStatus === "error"
+        ? t("draftSaveFailed")
+        : saveStatus === "dirty"
+          ? t("draftPending")
+          : t("draftSaved");
 
   return (
     <form className="space-y-5" onSubmit={form.handleSubmit((values) => submit.mutate(values))}>
       <Card>
         <CardHeader>
           <CardTitle>{t("feedbackForm")}</CardTitle>
-          <CardDescription>
-            {progress}% {t("complete")} - {autosave.isPending ? t("savingDraft") : t("draftSaved")}
+          <CardDescription aria-live="polite">
+            {progress}% {t("complete")} - {saveStatusLabel}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -170,13 +194,18 @@ export function FeedbackForm({
                     ))}
                   </div>
                 ) : question.type === "BOOLEAN" ? (
-                  <input
+                  <select
                     id={question.id}
-                    type="checkbox"
                     disabled={readOnly}
-                    className="h-4 w-4"
-                    {...form.register(`answers.${question.id}`)}
-                  />
+                    className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+                    {...form.register(`answers.${question.id}`, {
+                      setValueAs: (value) => (value === "" ? "" : value === "true")
+                    })}
+                  >
+                    <option value="">Select</option>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                  </select>
                 ) : question.type === "EMOJI_SCALE" ? (
                   <select
                     id={question.id}
