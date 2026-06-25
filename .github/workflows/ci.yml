@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: feedback
+          POSTGRES_PASSWORD: feedback
+          POSTGRES_DB: feedback_ai
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U feedback -d feedback_ai"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://feedback:feedback@localhost:5432/feedback_ai?schema=public
+      AUTH_SECRET: replace-with-at-least-32-characters
+      AUTH_URL: http://localhost:3000
+      AUTH_TRUST_HOST: "true"
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install
+      - run: npx prisma generate
+      - run: npx prisma db push
+      - run: npm run db:seed
+      - run: npm run lint
+      - run: npm run type-check
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e -- --project=chromium

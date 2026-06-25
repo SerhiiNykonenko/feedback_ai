@@ -1,0 +1,12 @@
+node_modules
+.next
+.npm-cache
+coverage
+playwright-report
+test-results
+.env
+.env*.local
+dist
+*.log
+*.tsbuildinfo
+docker/certs/*.pem
