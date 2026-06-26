@@ -9,3 +9,6 @@ test-results
 .env
 .env*.local
 *.log
+.extract
+feedback_ai-main.zip
+uploads
