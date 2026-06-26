@@ -21,8 +21,6 @@ services:
     build:
       context: .
       target: db-init
-      secrets:
-        - local_ca
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-feedback}:${POSTGRES_PASSWORD:-feedback}@postgres:5432/${POSTGRES_DB:-feedback_ai}?schema=public
     depends_on:
@@ -34,8 +32,6 @@ services:
     build:
       context: .
       target: runner
-      secrets:
-        - local_ca
     restart: unless-stopped
     depends_on:
       db-init:
@@ -53,6 +49,8 @@ services:
       DEMO_AUTH_FALLBACK: "false"
     ports:
       - "3000:3000"
+    volumes:
+      - avatar_uploads:/app/uploads
     healthcheck:
       test:
         [
@@ -68,7 +66,4 @@ services:
 
 volumes:
   postgres_data:
-
-secrets:
-  local_ca:
-    file: ./docker/certs/avast-web-shield-root.pem
+  avatar_uploads:

@@ -91,6 +91,7 @@ export const authConfig = {
         if (!dbUser) return token;
         token.name = dbUser.name;
         token.email = dbUser.email;
+        token.picture = dbUser.image;
         token.teamId = dbUser.teamId;
         token.roles = dbUser.roles.map((userRole) => userRole.role.key);
         token.permissions = Array.from(
@@ -113,6 +114,7 @@ export const authConfig = {
         session.user.teamId = token.teamId as string | null;
         session.user.roles = (token.roles as string[]) ?? [];
         session.user.permissions = (token.permissions as string[]) ?? [];
+        session.user.image = (token.picture as string | null) ?? null;
       }
       return session;
     }

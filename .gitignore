@@ -10,3 +10,4 @@ dist
 *.log
 *.tsbuildinfo
 docker/certs/*.pem
+uploads/

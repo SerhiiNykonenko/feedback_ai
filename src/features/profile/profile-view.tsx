@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useI18n } from "@/components/i18n-provider";
+import { AvatarUpload } from "./avatar-upload";
 
 type Profile = Awaited<ReturnType<typeof import("./data").getProfile>>;
 
@@ -15,19 +16,20 @@ export function ProfileView({ profile }: { profile: Profile }) {
         <p className="text-sm text-muted-foreground">{t("profileSubtitle")}</p>
       </div>
       <Card>
-        <CardHeader>
-          <CardTitle>{profile.name}</CardTitle>
-          <CardDescription>
-            {profile.title ?? "Employee"} - {profile.email}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            {profile.roles.map((role) => (
-              <Badge key={role.roleId}>{role.role.name}</Badge>
-            ))}
-            {profile.team ? <Badge>{profile.team.name}</Badge> : null}
-            {profile.manager ? <Badge>Manager: {profile.manager.name}</Badge> : null}
+        <CardContent className="grid gap-6 p-6 sm:grid-cols-[auto_1fr]">
+          <AvatarUpload name={profile.name} image={profile.image} />
+          <div>
+            <CardTitle className="text-xl">{profile.name}</CardTitle>
+            <CardDescription className="mt-1">
+              {profile.title ?? "Employee"} - {profile.email}
+            </CardDescription>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {profile.roles.map((role) => (
+                <Badge key={role.roleId}>{role.role.name}</Badge>
+              ))}
+              {profile.team ? <Badge>{profile.team.name}</Badge> : null}
+              {profile.manager ? <Badge>Manager: {profile.manager.name}</Badge> : null}
+            </div>
           </div>
         </CardContent>
       </Card>

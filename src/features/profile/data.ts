@@ -22,6 +22,7 @@ export async function getProfile(userId: string) {
       name: user.name,
       email: user.email,
       title: user.title,
+      image: null,
       team: { id: user.teamId, name: user.teamName },
       manager: user.managerName ? { id: "demo-manager", name: user.managerName } : null,
       roles: user.roles.map((role) => ({
