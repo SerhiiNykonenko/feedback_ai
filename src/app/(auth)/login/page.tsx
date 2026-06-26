@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { auth, signIn } from "@/server/auth";
 import { LanguageSwitcher } from "@/components/shell/language-switcher";
 import { LocalizedText } from "@/components/localized-text";
+import Image from "next/image";
 
 async function loginAction(formData: FormData) {
   "use server";
@@ -41,6 +42,14 @@ export default async function LoginPage({
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.16),transparent_34%),linear-gradient(135deg,hsl(var(--background)),hsl(var(--muted)))]">
       <div className="mx-auto grid min-h-screen w-full max-w-6xl items-center gap-8 px-4 py-10 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
         <section className="hidden lg:block">
+          <Image
+            src="/brand/bwt-logo.png"
+            alt="BWT"
+            width={190}
+            height={95}
+            className="mb-8 h-auto w-40"
+            priority
+          />
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border bg-background/70 px-3 py-1 text-sm text-muted-foreground shadow-soft backdrop-blur">
             <Sparkles className="h-4 w-4 text-primary" aria-hidden />
             Feedback workflows for software teams
@@ -85,9 +94,7 @@ export default async function LoginPage({
         <Card className="mx-auto w-full max-w-md border bg-background/90 shadow-soft backdrop-blur">
           <CardHeader className="space-y-2">
             <div className="flex items-center justify-between">
-              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <ShieldCheck className="h-5 w-5" aria-hidden />
-              </div>
+              <Image src="/brand/bwt-logo.png" alt="BWT" width={92} height={46} priority />
               <LanguageSwitcher />
             </div>
             <CardTitle className="text-2xl">

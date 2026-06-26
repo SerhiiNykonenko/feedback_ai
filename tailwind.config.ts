@@ -41,7 +41,10 @@ const config: Config = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))"
-        }
+        },
+        "brand-orange": "hsl(var(--brand-orange))",
+        "brand-purple": "hsl(var(--brand-purple))",
+        "brand-blue": "hsl(var(--brand-blue))"
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -52,7 +55,7 @@ const config: Config = {
         sans: ["var(--font-geist-sans)", "Inter", "system-ui", "sans-serif"]
       },
       boxShadow: {
-        soft: "0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.06)"
+        soft: "0 1px 2px rgba(15, 23, 42, 0.08), 0 8px 24px rgba(15, 23, 42, 0.07)"
       }
     }
   },
