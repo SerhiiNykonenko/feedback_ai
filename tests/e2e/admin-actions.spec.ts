@@ -4,7 +4,7 @@ test("admin can create a product and switch language", async ({ page }) => {
   await page.goto("/login");
   await page.evaluate(() => window.localStorage.setItem("feedback-locale", "en"));
   await page.reload();
-  await page.getByLabel("Email").fill("admin@example.com");
+  await page.getByLabel("Email").fill("nykonenko_sv+admin@groupbwt.com");
   await page.getByLabel("Password").fill("Password123!");
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/dashboard/);

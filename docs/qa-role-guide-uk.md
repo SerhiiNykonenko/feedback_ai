@@ -10,11 +10,11 @@
 
 | Роль          | Email                  | Тестовий користувач | Команда              |
 | ------------- | ---------------------- | ------------------- | -------------------- |
-| Employee      | `employee@example.com` | Elena Employee      | Platform Engineering |
-| Manager       | `manager@example.com`  | Maks Manager        | Platform Engineering |
-| HR            | `hr@example.com`       | Hanna HR            | People Operations    |
-| Admin         | `admin@example.com`    | Ada Admin           | People Operations    |
-| Employee / QA | `qa@example.com`       | Quinn QA            | Quality Guild        |
+| Employee      | `nykonenko_sv@groupbwt.com`       | Elena Employee | Platform Engineering |
+| Manager       | `nykonenko_sv+manager@groupbwt.com` | Maks Manager | Platform Engineering |
+| HR            | `nykonenko_sv+hr@groupbwt.com`    | Hanna HR       | People Operations    |
+| Admin         | `nykonenko_sv+admin@groupbwt.com` | Ada Admin      | People Operations    |
+| Employee / QA | `nykonenko_sv+qa@groupbwt.com`    | Quinn QA       | Quality Guild        |
 
 Перед тестуванням перевір:
 

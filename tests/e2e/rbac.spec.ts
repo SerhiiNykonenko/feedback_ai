@@ -2,22 +2,22 @@ import { expect, test } from "@playwright/test";
 
 const roles = [
   {
-    email: "employee@example.com",
+    email: "nykonenko_sv@groupbwt.com",
     allowed: ["/dashboard", "/reviews", "/analytics", "/profile"],
     forbidden: ["/templates", "/settings"]
   },
   {
-    email: "manager@example.com",
+    email: "nykonenko_sv+manager@groupbwt.com",
     allowed: ["/dashboard", "/reviews", "/analytics", "/profile"],
     forbidden: ["/templates", "/settings"]
   },
   {
-    email: "hr@example.com",
+    email: "nykonenko_sv+hr@groupbwt.com",
     allowed: ["/dashboard", "/reviews", "/templates", "/analytics", "/profile"],
     forbidden: ["/settings"]
   },
   {
-    email: "admin@example.com",
+    email: "nykonenko_sv+admin@groupbwt.com",
     allowed: ["/dashboard", "/reviews", "/templates", "/analytics", "/settings", "/profile"],
     forbidden: []
   }

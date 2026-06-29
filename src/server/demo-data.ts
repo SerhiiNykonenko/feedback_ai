@@ -6,7 +6,7 @@ export const demoPassword = "Password123!";
 export const demoUsers = [
   {
     id: "demo-employee",
-    email: "employee@example.com",
+    email: "nykonenko_sv@groupbwt.com",
     name: "Elena Employee",
     title: "Software Engineer",
     teamId: "demo-platform-team",
@@ -16,7 +16,7 @@ export const demoUsers = [
   },
   {
     id: "demo-manager",
-    email: "manager@example.com",
+    email: "nykonenko_sv+manager@groupbwt.com",
     name: "Maks Manager",
     title: "Engineering Manager",
     teamId: "demo-platform-team",
@@ -25,7 +25,7 @@ export const demoUsers = [
   },
   {
     id: "demo-hr",
-    email: "hr@example.com",
+    email: "nykonenko_sv+hr@groupbwt.com",
     name: "Hanna HR",
     title: "HR Business Partner",
     teamId: "demo-people-team",
@@ -34,7 +34,7 @@ export const demoUsers = [
   },
   {
     id: "demo-admin",
-    email: "admin@example.com",
+    email: "nykonenko_sv+admin@groupbwt.com",
     name: "Ada Admin",
     title: "Systems Administrator",
     teamId: "demo-people-team",
@@ -43,7 +43,7 @@ export const demoUsers = [
   },
   {
     id: "demo-qa",
-    email: "qa@example.com",
+    email: "nykonenko_sv+qa@groupbwt.com",
     name: "Quinn QA",
     title: "QA Engineer",
     teamId: "demo-quality-team",

@@ -151,52 +151,69 @@ async function main() {
   const users = await Promise.all(
     [
       {
-        email: "employee@example.com",
+        email: "nykonenko_sv@groupbwt.com",
+        legacyEmail: "employee@example.com",
         name: "Elena Employee",
         title: "Software Engineer",
         teamId: teams[0].id,
         role: employeeRole
       },
       {
-        email: "manager@example.com",
+        email: "nykonenko_sv+manager@groupbwt.com",
+        legacyEmail: "manager@example.com",
         name: "Maks Manager",
         title: "Engineering Manager",
         teamId: teams[0].id,
         role: managerRole
       },
       {
-        email: "hr@example.com",
+        email: "nykonenko_sv+hr@groupbwt.com",
+        legacyEmail: "hr@example.com",
         name: "Hanna HR",
         title: "HR Business Partner",
         teamId: teams[2].id,
         role: hrRole
       },
       {
-        email: "admin@example.com",
+        email: "nykonenko_sv+admin@groupbwt.com",
+        legacyEmail: "admin@example.com",
         name: "Ada Admin",
         title: "Systems Administrator",
         teamId: teams[2].id,
         role: adminRole
       },
       {
-        email: "qa@example.com",
+        email: "nykonenko_sv+qa@groupbwt.com",
+        legacyEmail: "qa@example.com",
         name: "Quinn QA",
         title: "QA Engineer",
         teamId: teams[1].id,
         role: employeeRole
       }
     ].map(async (user) => {
-      const created = await prisma.user.upsert({
-        where: { email: user.email },
-        update: { name: user.name, title: user.title, teamId: user.teamId, passwordHash },
-        create: {
-          email: user.email,
-          name: user.name,
-          title: user.title,
-          teamId: user.teamId,
-          passwordHash
-        }
-      });
+      const existing =
+        (await prisma.user.findUnique({ where: { email: user.email } })) ??
+        (await prisma.user.findUnique({ where: { email: user.legacyEmail } }));
+      const created = existing
+        ? await prisma.user.update({
+            where: { id: existing.id },
+            data: {
+              email: user.email,
+              name: user.name,
+              title: user.title,
+              teamId: user.teamId,
+              passwordHash
+            }
+          })
+        : await prisma.user.create({
+            data: {
+              email: user.email,
+              name: user.name,
+              title: user.title,
+              teamId: user.teamId,
+              passwordHash
+            }
+          });
       await prisma.userRole.upsert({
         where: { userId_roleId: { userId: created.id, roleId: user.role.id } },
         update: {},

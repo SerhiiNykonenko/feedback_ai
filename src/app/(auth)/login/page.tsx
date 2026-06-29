@@ -24,10 +24,10 @@ async function loginAction(formData: FormData) {
 }
 
 const demoAccounts = [
-  { label: "Employee", email: "employee@example.com" },
-  { label: "Manager", email: "manager@example.com" },
-  { label: "HR", email: "hr@example.com" },
-  { label: "Admin", email: "admin@example.com" }
+  { label: "Employee", email: "nykonenko_sv@groupbwt.com" },
+  { label: "Manager", email: "nykonenko_sv+manager@groupbwt.com" },
+  { label: "HR", email: "nykonenko_sv+hr@groupbwt.com" },
+  { label: "Admin", email: "nykonenko_sv+admin@groupbwt.com" }
 ];
 
 export default async function LoginPage({
@@ -121,7 +121,7 @@ export default async function LoginPage({
                   name="email"
                   type="email"
                   autoComplete="email"
-                  placeholder="employee@example.com"
+                  placeholder="nykonenko_sv@groupbwt.com"
                   required
                 />
               </div>
