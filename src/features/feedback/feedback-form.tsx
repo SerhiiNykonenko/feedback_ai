@@ -10,7 +10,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useI18n } from "@/components/i18n-provider";
-import { calculateFeedbackProgress, completedAnswers } from "@/domain/feedback-answers";
+import {
+  calculateFeedbackProgress,
+  completedAnswers,
+  isCompletedAnswer
+} from "@/domain/feedback-answers";
 import { saveFeedbackDraft, submitFeedback } from "./actions";
 
 type FeedbackQuestion = {
@@ -112,6 +116,10 @@ export function FeedbackForm({
 
   const answers = form.watch("answers");
   const progress = calculateFeedbackProgress(answers, questions);
+  const completedCount = completedAnswers(answers, questions).length;
+  const requiredMissing = questions.filter(
+    (question) => question.required && !isCompletedAnswer(answers?.[question.id], question.type)
+  ).length;
   const saveStatusLabel =
     saveStatus === "saving"
       ? t("savingDraft")
@@ -149,6 +157,11 @@ export function FeedbackForm({
               <div key={question.id} className="space-y-2">
                 <label className="text-sm font-medium" htmlFor={question.id}>
                   {question.prompt}
+                  {question.required ? (
+                    <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                      Required
+                    </span>
+                  ) : null}
                 </label>
                 {question.type === "LONG_TEXT" ? (
                   <Textarea
@@ -233,10 +246,22 @@ export function FeedbackForm({
         </Card>
       ))}
       {!readOnly ? (
-        <div className="flex justify-end">
-          <Button type="submit" disabled={submit.isPending}>
-            {t("submitFeedback")}
-          </Button>
+        <div className="sticky bottom-4 z-10 rounded-xl border bg-card/95 p-3 shadow-lg backdrop-blur">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-sm">
+              <p className="font-medium">
+                {completedCount} of {questions.length} questions answered
+              </p>
+              <p className="text-muted-foreground">
+                {requiredMissing > 0
+                  ? `${requiredMissing} required question${requiredMissing === 1 ? "" : "s"} left`
+                  : saveStatusLabel}
+              </p>
+            </div>
+            <Button type="submit" disabled={submit.isPending || requiredMissing > 0}>
+              {submit.isPending ? t("loading") : t("submitFeedback")}
+            </Button>
+          </div>
         </div>
       ) : null}
     </form>

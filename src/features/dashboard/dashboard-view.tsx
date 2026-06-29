@@ -1,14 +1,65 @@
 "use client";
 
+import Link from "next/link";
+import type { LucideIcon } from "lucide-react";
+import { ArrowRight, CheckCircle2, ClipboardList, Send } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { formatPercent } from "@/lib/utils";
 import { useI18n } from "@/components/i18n-provider";
 
 type DashboardData = Awaited<ReturnType<typeof import("./data").getDashboardData>>;
+type NextAction = {
+  title: string;
+  value: number;
+  description: string;
+  icon: LucideIcon;
+  href: string;
+};
 
-export function DashboardView({ data }: { data: DashboardData }) {
+function isNextAction(action: NextAction | null): action is NextAction {
+  return action !== null;
+}
+
+export function DashboardView({
+  data,
+  permissions
+}: {
+  data: DashboardData;
+  permissions: string[];
+}) {
   const { t } = useI18n();
+  const canReview = permissions.includes("feedback.review.team");
+  const canPublish = permissions.includes("feedback.publish");
+  const nextActions = [
+    {
+      title: "Write feedback",
+      value: data.draftsToWrite,
+      description: "Drafts assigned to you.",
+      icon: ClipboardList,
+      href: "/reviews"
+    },
+    canReview
+      ? {
+          title: "Review team feedback",
+          value: data.waitingForReview,
+          description: "Submitted feedback waiting for manager review.",
+          icon: CheckCircle2,
+          href: "/reviews"
+        }
+      : null,
+    canPublish
+      ? {
+          title: "Publish approved feedback",
+          value: data.readyToPublish,
+          description: "Approved feedback ready to share.",
+          icon: Send,
+          href: "/reviews"
+        }
+      : null
+  ].filter(isNextAction);
+
   const cards = [
     { title: t("pendingReviews"), value: data.pendingReviews, description: t("reviewsSubtitle") },
     {
@@ -26,10 +77,47 @@ export function DashboardView({ data }: { data: DashboardData }) {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">{t("dashboard")}</h1>
-        <p className="text-sm text-muted-foreground">{t("dashboardSubtitle")}</p>
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">{t("dashboard")}</h1>
+          <p className="text-sm text-muted-foreground">
+            Start with the items that need your attention today.
+          </p>
+        </div>
+        <Button asChild>
+          <Link href="/reviews">
+            Open review workspace
+            <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
+          </Link>
+        </Button>
       </div>
+
+      <section className="grid gap-4 lg:grid-cols-3" aria-label="Next actions">
+        {nextActions.map((action) => {
+          const Icon = action.icon;
+          return (
+            <Card
+              key={action.title}
+              className={action.value > 0 ? "border-primary/25 bg-primary/5" : undefined}
+            >
+              <CardHeader>
+                <div className="flex items-center justify-between gap-3">
+                  <CardDescription>{action.title}</CardDescription>
+                  <Icon className="h-5 w-5 text-primary" aria-hidden />
+                </div>
+                <CardTitle className="text-3xl">{action.value}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-muted-foreground">{action.description}</p>
+                <Button asChild size="sm" variant={action.value > 0 ? "default" : "outline"}>
+                  <Link href={action.href}>{action.value > 0 ? "Continue" : "View"}</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </section>
+
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="Dashboard metrics">
         {cards.map((card) => (
           <Card key={card.title}>
@@ -43,6 +131,7 @@ export function DashboardView({ data }: { data: DashboardData }) {
           </Card>
         ))}
       </section>
+
       <Card>
         <CardHeader>
           <CardTitle>{t("recentActivity")}</CardTitle>

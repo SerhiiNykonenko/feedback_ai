@@ -11,6 +11,7 @@ const dictionaries = {
     signedIn: "Signed in",
     signOut: "Sign out",
     notifications: "Notifications",
+    unread: "unread",
     searchPlaceholder: "Search users, teams, products, cycles",
     noResults: "No results",
     searching: "Searching...",
@@ -72,6 +73,8 @@ const dictionaries = {
     questionPrompt: "Question prompt",
     cycleName: "Cycle name",
     cycleType: "Cycle type",
+    cycleStarts: "Cycle starts",
+    cycleEnds: "Cycle ends",
     template: "Template",
     subject: "Review subject",
     author: "Feedback author",
@@ -84,12 +87,15 @@ const dictionaries = {
     complete: "complete",
     welcomeBack: "Welcome back",
     loginSubtitle: "Sign in to Feedback AI. Local demo accounts use Password123!.",
-    emailPlaceholder: "employee@example.com",
+    emailPlaceholder: "nykonenko_sv@groupbwt.com",
     signIn: "Sign in",
     demoAccounts: "Demo accounts",
     loginFailed: "Sign-in failed. Check the email and password."
   },
   uk: {
+    cycleStarts: "Початок циклу",
+    cycleEnds: "Завершення циклу",
+    unread: "непрочитаних",
     dashboard: "Головна",
     reviews: "Оцінювання",
     templates: "Шаблони",
@@ -173,7 +179,7 @@ const dictionaries = {
     welcomeBack: "З поверненням",
     loginSubtitle:
       "Увійдіть у Feedback AI. Локальні демо-акаунти використовують пароль Password123!.",
-    emailPlaceholder: "employee@example.com",
+    emailPlaceholder: "nykonenko_sv@groupbwt.com",
     signIn: "Увійти",
     demoAccounts: "Демо-акаунти",
     loginFailed: "Не вдалося увійти. Перевірте електронну пошту та пароль."
