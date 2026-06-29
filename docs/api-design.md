@@ -29,3 +29,8 @@ Implemented actions:
 ## Future Production Adapters
 
 The code keeps adapter boundaries for email, monitoring, storage, and rate limiting. For production, replace the local email logger and memory rate limiter with durable providers such as SES/Postmark and Redis.
+
+`POST /api/internal/notifications/process` is a worker-only endpoint protected by
+`NOTIFICATION_WORKER_SECRET`. It atomically claims pending email deliveries, sends them through the
+configured provider, and records retry or terminal delivery state. Production should invoke it from
+a private scheduler; Docker Compose runs the bundled worker process for local development.

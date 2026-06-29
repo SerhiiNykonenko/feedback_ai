@@ -43,6 +43,10 @@ services:
       AUTH_URL: ${AUTH_URL:-http://localhost:3000}
       AUTH_TRUST_HOST: "true"
       EMAIL_FROM: ${EMAIL_FROM:-Feedback AI <no-reply@example.com>}
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-local}
+      POSTMARK_SERVER_TOKEN: ${POSTMARK_SERVER_TOKEN:-}
+      POSTMARK_MESSAGE_STREAM: ${POSTMARK_MESSAGE_STREAM:-outbound}
+      NOTIFICATION_WORKER_SECRET: ${NOTIFICATION_WORKER_SECRET:-local-notification-worker-secret-change-me}
       RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-60000}
       RATE_LIMIT_MAX_REQUESTS: ${RATE_LIMIT_MAX_REQUESTS:-120}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
@@ -63,6 +67,20 @@ services:
       timeout: 5s
       retries: 10
       start_period: 15s
+
+  notification-worker:
+    build:
+      context: .
+      target: runner
+    restart: unless-stopped
+    command: ["node", "scripts/notification-worker.mjs"]
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      NOTIFICATION_WORKER_URL: http://app:3000/api/internal/notifications/process
+      NOTIFICATION_WORKER_SECRET: ${NOTIFICATION_WORKER_SECRET:-local-notification-worker-secret-change-me}
+      NOTIFICATION_WORKER_INTERVAL_MS: ${NOTIFICATION_WORKER_INTERVAL_MS:-10000}
 
 volumes:
   postgres_data:

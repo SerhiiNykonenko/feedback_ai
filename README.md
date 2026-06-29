@@ -13,6 +13,20 @@ Production-oriented feedback management system for software organizations.
 
 The Compose stack starts PostgreSQL, waits for it to become healthy, pushes the Prisma schema, seeds realistic data, and then starts the application.
 
+### Transactional email
+
+Docker starts a notification worker that processes the PostgreSQL-backed delivery outbox. The
+default `EMAIL_PROVIDER=local` records deliveries in application logs without sending externally.
+To enable Postmark, configure a verified sender and set:
+
+- `EMAIL_PROVIDER=postmark`
+- `EMAIL_FROM=Feedback AI <feedback@your-verified-domain.com>`
+- `POSTMARK_SERVER_TOKEN`
+- `NOTIFICATION_WORKER_SECRET` to a unique value of at least 32 characters
+
+The worker retries transient failures with exponential backoff. The protected processing endpoint
+can be called by a private scheduler outside Docker.
+
 If antivirus HTTPS scanning replaces TLS certificates inside containers, export its public root CA and pass it to the build as the optional BuildKit secret named `local_ca`. The certificate is ignored by Git and is not stored in image layers.
 
 Useful commands:
@@ -34,11 +48,11 @@ Useful commands:
 
 Seeded login accounts all use `Password123!`:
 
-- `employee@example.com`
-- `manager@example.com`
-- `hr@example.com`
-- `admin@example.com`
-- `qa@example.com`
+- `nykonenko_sv@groupbwt.com`
+- `nykonenko_sv+manager@groupbwt.com`
+- `nykonenko_sv+hr@groupbwt.com`
+- `nykonenko_sv+admin@groupbwt.com`
+- `nykonenko_sv+qa@groupbwt.com`
 
 For local development, `.env` sets `DEMO_AUTH_FALLBACK="true"`. If PostgreSQL is not running, these same accounts still sign in with demo data so the UI can be reviewed. With PostgreSQL available, the app uses the database-backed Auth.js and Prisma flow.
 

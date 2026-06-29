@@ -16,4 +16,9 @@ if (existsSync(standaloneDir)) {
   if (existsSync(publicDir)) {
     await cp(publicDir, path.join(standaloneDir, "public"), { recursive: true });
   }
+
+  const workerScript = path.join(root, "scripts", "notification-worker.mjs");
+  const standaloneScriptsDir = path.join(standaloneDir, "scripts");
+  await mkdir(standaloneScriptsDir, { recursive: true });
+  await cp(workerScript, path.join(standaloneScriptsDir, "notification-worker.mjs"));
 }

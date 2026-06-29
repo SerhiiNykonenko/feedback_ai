@@ -6,6 +6,7 @@ import { prisma } from "@/server/db";
 import { writeAuditLog } from "@/server/audit";
 import { canTransitionFeedback } from "@/domain/workflows";
 import { answerValueSchema, questionTypeSchema } from "@/domain/question-validation";
+import { queueFeedbackRequestedNotification } from "@/features/notifications/service";
 import {
   commentSchema,
   requestFeedbackSchema,
@@ -138,63 +139,80 @@ const requestFeedbackAction = createServerAction({
   permission: "feedback.request",
   schema: requestFeedbackSchema,
   async handler(input, context) {
-    const cycle = await prisma.reviewCycle.findUniqueOrThrow({
-      where: { id: input.cycleId },
-      include: {
-        template: {
+    const feedback = await prisma.$transaction(async (transaction) => {
+      const [cycle, author, requester] = await Promise.all([
+        transaction.reviewCycle.findUniqueOrThrow({
+          where: { id: input.cycleId },
           include: {
-            sections: {
-              include: { questions: true },
-              orderBy: { order: "asc" }
+            template: {
+              include: {
+                sections: {
+                  include: { questions: true },
+                  orderBy: { order: "asc" }
+                }
+              }
             }
           }
-        }
+        }),
+        transaction.user.findFirstOrThrow({
+          where: { id: input.authorId, status: "ACTIVE" },
+          select: { id: true, email: true, name: true }
+        }),
+        transaction.user.findUniqueOrThrow({
+          where: { id: context.userId },
+          select: { name: true }
+        })
+      ]);
+
+      if (cycle.status !== "ACTIVE") {
+        throw new Error("Feedback can only be requested in an active cycle");
       }
-    });
-    if (cycle.status !== "ACTIVE")
-      throw new Error("Feedback can only be requested in an active cycle");
-    const templateSnapshot = {
-      id: cycle.template.id,
-      name: cycle.template.name,
-      version: cycle.template.version,
-      sections: cycle.template.sections.map((section) => ({
-        id: section.id,
-        title: section.title,
-        order: section.order,
-        questions: section.questions.map((question) => ({
-          id: question.id,
-          prompt: question.prompt,
-          type: question.type,
-          required: question.required,
-          options: question.options,
-          order: question.order
+
+      const templateSnapshot = {
+        id: cycle.template.id,
+        name: cycle.template.name,
+        version: cycle.template.version,
+        sections: cycle.template.sections.map((section) => ({
+          id: section.id,
+          title: section.title,
+          order: section.order,
+          questions: section.questions.map((question) => ({
+            id: question.id,
+            prompt: question.prompt,
+            type: question.type,
+            required: question.required,
+            options: question.options,
+            order: question.order
+          }))
         }))
-      }))
-    };
-    const feedback = await prisma.feedback.create({
-      data: {
-        cycleId: cycle.id,
-        requesterId: context.userId,
-        subjectId: input.subjectId,
-        authorId: input.authorId,
-        templateSnapshot
-      }
-    });
-    await prisma.notification.create({
-      data: {
-        userId: input.authorId,
-        type: "feedback_requested",
-        title: "Feedback requested",
-        body: `You have a new feedback request in ${cycle.name}.`,
-        href: `/reviews/${feedback.id}`
-      }
-    });
-    await writeAuditLog({
-      actorId: context.userId,
-      action: "CREATE",
-      entityType: "Feedback",
-      entityId: feedback.id,
-      summary: "Requested feedback"
+      };
+      const createdFeedback = await transaction.feedback.create({
+        data: {
+          cycleId: cycle.id,
+          requesterId: context.userId,
+          subjectId: input.subjectId,
+          authorId: author.id,
+          templateSnapshot
+        }
+      });
+
+      await queueFeedbackRequestedNotification(transaction, {
+        feedbackId: createdFeedback.id,
+        authorId: author.id,
+        authorEmail: author.email,
+        authorName: author.name,
+        requesterName: requester.name,
+        cycleName: cycle.name
+      });
+      await writeAuditLog({
+        actorId: context.userId,
+        action: "CREATE",
+        entityType: "Feedback",
+        entityId: createdFeedback.id,
+        summary: "Requested feedback"
+      }, transaction);
+
+      return createdFeedback;
     });
     revalidatePath("/reviews");
     return feedback;

@@ -62,6 +62,18 @@ enum NotificationStatus {
   FAILED
 }
 
+enum DeliveryChannel {
+  EMAIL
+  SLACK
+}
+
+enum DeliveryStatus {
+  PENDING
+  PROCESSING
+  SENT
+  FAILED
+}
+
 enum AuditAction {
   CREATE
   UPDATE
@@ -102,6 +114,7 @@ model User {
   answers            Answer[]
   comments           Comment[]
   notifications      Notification[]
+  notificationDeliveries NotificationDelivery[]
   attachments        Attachment[]
   auditLogs          AuditLog[]          @relation("AuditActor")
   mentionedComments  CommentMention[]
@@ -347,9 +360,37 @@ model Notification {
   createdAt   DateTime            @default(now())
   readAt      DateTime?
   user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries NotificationDelivery[]
 
   @@index([userId, status, createdAt])
   @@index([type])
+}
+
+model NotificationDelivery {
+  id                String          @id @default(cuid())
+  notificationId    String
+  userId            String
+  channel           DeliveryChannel
+  status            DeliveryStatus  @default(PENDING)
+  recipient         String
+  templateKey       String
+  subject           String
+  payload           Json
+  idempotencyKey    String          @unique
+  providerMessageId String?
+  attempts          Int             @default(0)
+  availableAt       DateTime        @default(now())
+  lockedAt          DateTime?
+  sentAt            DateTime?
+  lastError         String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  notification      Notification    @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, availableAt])
+  @@index([userId, createdAt])
+  @@index([notificationId])
 }
 
 model Attachment {

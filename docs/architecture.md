@@ -32,7 +32,7 @@ Outer layers may import inward. Inner layers must not import Next.js request API
 | Templates     | Built-in and custom templates, sections, questions                     | Zod validation, Prisma                |
 | Feedback      | Draft autosave, submission, approvals, comments, mentions, attachments | Workflow, notifications, audit        |
 | Analytics     | Employee/team/org score summaries and trends                           | Feedback answers, Prisma aggregations |
-| Notifications | In-app notifications and email dispatch points                         | Email adapter, audit logs             |
+| Notifications | In-app notifications, transactional outbox, email delivery and retries  | Email adapter, worker, audit logs     |
 | Search        | Debounced server-side search across people/products/teams/cycles       | Prisma text indexes                   |
 | Settings      | Users, teams, products, roles, system configuration                    | RBAC, audit logs                      |
 | Profile       | Current user profile, preferences, notification settings               | Auth, users                           |
@@ -157,7 +157,7 @@ Alternatives considered:
 Failure points and mitigations:
 
 - Server Actions can become unstructured. Mitigation: all actions go through `createServerAction`, which enforces auth, RBAC, validation, rate limiting, logging, and typed results.
-- Long-running work can block requests. Mitigation: email/monitoring are adapter boundaries and can later move to a queue without changing feature code.
+- Long-running work can block requests. Mitigation: external notification delivery uses a PostgreSQL-backed transactional outbox and a separate worker, while provider details remain behind adapters.
 
 ### Prisma with PostgreSQL
 
@@ -244,7 +244,7 @@ Failure points and mitigations:
 
 - Add a typed `ActionResult<T>` contract for every Server Action so errors are structured and UI behavior is consistent.
 - Use immutable template/question snapshots on each feedback record so historical reviews remain stable when templates change.
-- Add a notification outbox table later if email delivery must become guaranteed across process crashes.
+- Extend the notification delivery outbox with Slack as a second channel after the email delivery metrics and retry behavior are validated.
 - Add materialized analytics tables once the feedback dataset grows beyond what indexed live aggregation can comfortably support.
 - Add object storage and virus scanning integration for production attachments; local development uses metadata-only seeded files.
 - Add audit logs for permission changes, workflow transitions, approvals, publishing, template edits, and user/team/product administration.
