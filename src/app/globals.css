@@ -3,26 +3,26 @@
 @tailwind utilities;
 
 :root {
-  --background: 210 33% 98%;
-  --foreground: 222 47% 11%;
+  --background: 228 33% 98%;
+  --foreground: 226 30% 15%;
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --primary: 221 83% 53%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 32% 94%;
-  --secondary-foreground: 222 47% 11%;
-  --muted: 210 32% 94%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 210 32% 93%;
-  --accent-foreground: 222 47% 11%;
+  --card-foreground: 226 30% 15%;
+  --primary: 279 43% 36%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 214 45% 94%;
+  --secondary-foreground: 213 48% 27%;
+  --muted: 226 26% 95%;
+  --muted-foreground: 221 14% 42%;
+  --accent: 276 25% 94%;
+  --accent-foreground: 279 38% 27%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 210 40% 98%;
-  --border: 214 25% 84%;
-  --input: 214 24% 78%;
-  --ring: 221 83% 53%;
-  --brand-orange: 24 88% 54%;
-  --brand-purple: 282 55% 27%;
-  --brand-blue: 211 83% 34%;
+  --border: 225 23% 85%;
+  --input: 224 21% 78%;
+  --ring: 279 43% 36%;
+  --brand-orange: 27 76% 52%;
+  --brand-purple: 279 43% 36%;
+  --brand-blue: 211 62% 39%;
   --radius: 0.5rem;
 }
 
@@ -55,10 +55,41 @@
 
 body {
   background:
+    radial-gradient(circle at 10% 6%, hsl(var(--brand-orange) / 0.045), transparent 25rem),
+    radial-gradient(circle at 90% 3%, hsl(var(--brand-blue) / 0.065), transparent 30rem),
+    hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.dark body {
+  background:
     radial-gradient(circle at 12% 8%, hsl(var(--brand-orange) / 0.055), transparent 24rem),
     radial-gradient(circle at 88% 4%, hsl(var(--brand-blue) / 0.055), transparent 28rem),
     hsl(var(--background));
-  color: hsl(var(--foreground));
+}
+
+:root:not(.dark) .app-shell-header {
+  background-image: linear-gradient(
+    90deg,
+    hsl(var(--card) / 0.98),
+    hsl(var(--brand-blue) / 0.04),
+    hsl(var(--brand-purple) / 0.035)
+  );
+}
+
+:root:not(.dark) .app-shell-sidebar {
+  background-image: linear-gradient(
+    180deg,
+    hsl(var(--card)),
+    hsl(var(--brand-purple) / 0.025) 55%,
+    hsl(var(--brand-blue) / 0.04)
+  );
+}
+
+:root:not(.dark) .app-card {
+  box-shadow:
+    0 1px 2px hsl(var(--brand-purple) / 0.045),
+    0 10px 28px hsl(var(--brand-blue) / 0.055);
 }
 
 :focus-visible {

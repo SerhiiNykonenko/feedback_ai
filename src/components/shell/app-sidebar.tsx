@@ -61,7 +61,7 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        "sticky top-0 hidden h-screen shrink-0 flex-col border-r bg-card transition-[width] duration-200 lg:flex",
+        "app-shell-sidebar sticky top-0 hidden h-screen shrink-0 flex-col border-r bg-card transition-[width] duration-200 lg:flex",
         collapsed ? "w-16" : "w-64"
       )}
       data-collapsed={collapsed}
