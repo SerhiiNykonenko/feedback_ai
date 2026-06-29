@@ -20,7 +20,7 @@ test("employee can request, complete, and submit feedback", async ({ page }) => 
   await expect(page.getByTestId("feedback-task")).toHaveCount(taskCountBeforeRequest + 1);
 
   const task = page.getByTestId("feedback-task").filter({ hasText: "Elena Employee" }).first();
-  await task.getByRole("link", { name: "Open form" }).click();
+  await task.getByRole("link", { name: "Continue" }).click();
 
   const ratings = page.locator('input[type="number"]');
   await expect(page.getByText(/^0% complete/)).toBeVisible();
@@ -44,5 +44,10 @@ test("employee can request, complete, and submit feedback", async ({ page }) => 
   await expect(submitButton).toBeDisabled();
   await expect(submitButton).toBeHidden({ timeout: 15_000 });
   await page.goto("/reviews");
-  await expect(page.getByText("submitted").first()).toBeVisible();
+  await expect(
+    page
+      .getByTestId("feedback-task")
+      .filter({ hasText: "Elena Employee -> Elena Employee" })
+      .filter({ hasText: "Ready for review" })
+  ).toBeVisible();
 });

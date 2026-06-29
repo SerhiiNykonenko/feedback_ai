@@ -13,8 +13,8 @@ const roles = [
   },
   {
     email: "nykonenko_sv+hr@groupbwt.com",
-    allowed: ["/dashboard", "/reviews", "/templates", "/analytics", "/profile"],
-    forbidden: ["/settings"]
+    allowed: ["/dashboard", "/reviews", "/templates", "/analytics", "/settings", "/profile"],
+    forbidden: []
   },
   {
     email: "nykonenko_sv+admin@groupbwt.com",
