@@ -14,7 +14,8 @@ const markNotificationReadAction = createServerAction({
       data: { status: "READ", readAt: new Date() }
     });
     if (result.count !== 1) throw new Error("Notification not found");
-    revalidatePath("/dashboard");
+    revalidatePath("/", "layout");
+    revalidatePath("/profile");
     return { id: input.id };
   }
 });
