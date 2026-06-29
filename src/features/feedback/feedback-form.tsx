@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -49,6 +50,7 @@ export function FeedbackForm({
   readOnly?: boolean;
 }) {
   const { t } = useI18n();
+  const router = useRouter();
   const questions = useMemo(() => sections.flatMap((section) => section.questions), [sections]);
   const autosaveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const saveQueue = useRef<Promise<unknown>>(Promise.resolve());
@@ -94,6 +96,9 @@ export function FeedbackForm({
       const saved = await persistDraft(values);
       if (!saved.ok) return saved;
       return submitFeedback({ feedbackId });
+    },
+    onSuccess(result) {
+      if (result.ok) router.refresh();
     }
   });
 
