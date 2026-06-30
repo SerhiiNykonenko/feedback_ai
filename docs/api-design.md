@@ -34,3 +34,8 @@ The code keeps adapter boundaries for email, monitoring, storage, and rate limit
 `NOTIFICATION_WORKER_SECRET`. It atomically claims pending email deliveries, sends them through the
 configured provider, and records retry or terminal delivery state. Production should invoke it from
 a private scheduler; Docker Compose runs the bundled worker process for local development.
+
+`POST /api/assistant/chat` accepts a bounded user/assistant message history. It requires the
+`assistant.use` permission, validates input with Zod, applies a per-user rate limit, retrieves
+relevant product-help articles, and calls the local llama.cpp adapter. The route never exposes the
+model server directly and does not provide database tools.

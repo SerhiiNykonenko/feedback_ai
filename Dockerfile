@@ -21,6 +21,8 @@ ENV AUTH_TRUST_HOST=true
 ENV NEXT_PUBLIC_APP_URL=http://localhost:3000
 ENV DEMO_AUTH_FALLBACK=false
 ENV EMAIL_PROVIDER=local
+ENV LLM_BASE_URL=http://llama:8080/v1/
+ENV LLM_MODEL=qwen3-4b
 RUN --mount=type=secret,id=local_ca,required=false \
     if [ -f /run/secrets/local_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/local_ca; fi; \
     ./node_modules/.bin/prisma generate

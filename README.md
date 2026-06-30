@@ -27,6 +27,24 @@ To enable Postmark, configure a verified sender and set:
 The worker retries transient failures with exponential backoff. The protected processing endpoint
 can be called by a private scheduler outside Docker.
 
+### Local OSS AI guide
+
+The authenticated product guide uses only local OSS components: llama.cpp (MIT) and the official
+`Qwen/Qwen3-4B-GGUF:Q4_K_M` model (Apache 2.0). A deterministic bilingual retrieval layer selects
+relevant product-help articles for each question and filters role-specific guidance by permissions.
+The assistant has no database tools and cannot read feedback content.
+
+Start the application with the optional AI profile:
+
+```bash
+docker compose --profile ai up -d --build
+```
+
+The first start downloads the lightweight pinned llama.cpp server image and the approximately 2.5
+GB Q4 model, so it can take several minutes. CPU inference is supported; response time depends on
+the device. Use `docker compose --profile ai logs -f llama` to monitor model loading. Native
+development can point `LLM_BASE_URL` at an OpenAI-compatible local llama.cpp server.
+
 If antivirus HTTPS scanning replaces TLS certificates inside containers, export its public root CA and pass it to the build as the optional BuildKit secret named `local_ca`. The certificate is ignored by Git and is not stored in image layers.
 
 Useful commands:

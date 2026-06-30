@@ -33,6 +33,7 @@ Outer layers may import inward. Inner layers must not import Next.js request API
 | Feedback      | Draft autosave, submission, approvals, comments, mentions, attachments | Workflow, notifications, audit        |
 | Analytics     | Employee/team/org score summaries and trends                           | Feedback answers, Prisma aggregations |
 | Notifications | In-app notifications, transactional outbox, email delivery and retries  | Email adapter, worker, audit logs     |
+| Assistant     | Local product guidance with retrieved knowledge and role-aware answers   | llama.cpp adapter, auth, rate limiting |
 | Search        | Debounced server-side search across people/products/teams/cycles       | Prisma text indexes                   |
 | Settings      | Users, teams, products, roles, system configuration                    | RBAC, audit logs                      |
 | Profile       | Current user profile, preferences, notification settings               | Auth, users                           |
