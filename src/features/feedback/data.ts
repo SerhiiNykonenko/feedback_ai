@@ -1,9 +1,10 @@
 import "server-only";
+import { canViewFeedbackDetails, type FeedbackAccessActor } from "@/domain/feedback-access";
 import { prisma } from "@/server/db";
 
-export async function getFeedbackFormData(feedbackId: string, userId: string) {
-  const feedback = await prisma.feedback.findFirstOrThrow({
-    where: { id: feedbackId, authorId: userId },
+export async function getFeedbackFormData(feedbackId: string, actor: FeedbackAccessActor) {
+  const feedback = await prisma.feedback.findUniqueOrThrow({
+    where: { id: feedbackId },
     include: {
       subject: true,
       cycle: {
@@ -21,6 +22,21 @@ export async function getFeedbackFormData(feedbackId: string, userId: string) {
       answers: true
     }
   });
+
+  if (
+    !canViewFeedbackDetails(
+      {
+        status: feedback.status,
+        authorId: feedback.authorId,
+        requesterId: feedback.requesterId,
+        subjectId: feedback.subjectId,
+        subjectTeamId: feedback.subject.teamId
+      },
+      actor
+    )
+  ) {
+    throw new Error("Feedback access denied");
+  }
 
   return {
     id: feedback.id,

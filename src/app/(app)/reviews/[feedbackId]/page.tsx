@@ -1,17 +1,26 @@
 import { notFound } from "next/navigation";
 import { FeedbackForm } from "@/features/feedback/feedback-form";
 import { getFeedbackFormData } from "@/features/feedback/data";
-import { requirePermission } from "@/server/auth/guards";
+import { requireAnyPermission } from "@/server/auth/guards";
 
 export default async function FeedbackPage({
   params
 }: {
   params: Promise<{ feedbackId: string }>;
 }) {
-  const user = await requirePermission("feedback.write");
+  const user = await requireAnyPermission([
+    "feedback.read.own",
+    "feedback.review.team",
+    "feedback.approve",
+    "feedback.publish"
+  ]);
   const { feedbackId } = await params;
   try {
-    const feedback = await getFeedbackFormData(feedbackId, user.id);
+    const feedback = await getFeedbackFormData(feedbackId, {
+      userId: user.id,
+      teamId: user.teamId,
+      permissions: user.permissions
+    });
     return (
       <div className="space-y-5">
         <div>

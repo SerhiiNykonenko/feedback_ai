@@ -11,6 +11,7 @@ import { EmptyState } from "@/components/ui/state-view";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useI18n } from "@/components/i18n-provider";
+import { canViewFeedbackDetails } from "@/domain/feedback-access";
 import { cn } from "@/lib/utils";
 import { getFeedbackPrimaryAction, getFeedbackStatusMeta } from "@/domain/feedback-status";
 import { createReviewCycle, transitionReviewCycle } from "./actions";
@@ -29,11 +30,13 @@ function FeedbackStatusBadge({ status }: { status: string }) {
 function FeedbackTaskCard({
   feedback,
   currentUserId,
+  currentTeamId,
   permissions,
   run
 }: {
   feedback: FeedbackTask;
   currentUserId: string;
+  currentTeamId: string | null | undefined;
   permissions: string[];
   run: (action: () => Promise<{ ok: boolean; error?: string }>) => void;
 }) {
@@ -44,6 +47,16 @@ function FeedbackTaskCard({
   const canApprove =
     feedback.status === "UNDER_REVIEW" && permissions.includes("feedback.approve");
   const canPublish = feedback.status === "APPROVED" && permissions.includes("feedback.publish");
+  const canOpen = canViewFeedbackDetails(
+    {
+      status: feedback.status,
+      authorId: feedback.authorId,
+      requesterId: feedback.requesterId,
+      subjectId: feedback.subjectId,
+      subjectTeamId: feedback.subject.teamId
+    },
+    { userId: currentUserId, teamId: currentTeamId, permissions }
+  );
   const statusMeta = getFeedbackStatusMeta(feedback.status);
 
   return (
@@ -60,10 +73,10 @@ function FeedbackTaskCard({
           <p className="text-xs text-muted-foreground">{statusMeta.description}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {isAuthorDraft ? (
-            <Button asChild size="sm">
+          {canOpen ? (
+            <Button asChild size="sm" variant={isAuthorDraft ? "default" : "outline"}>
               <Link data-testid={`open-feedback-${feedback.id}`} href={`/reviews/${feedback.id}`}>
-                {getFeedbackPrimaryAction(feedback.status)}
+                {isAuthorDraft ? getFeedbackPrimaryAction(feedback.status) : "View"}
               </Link>
             </Button>
           ) : null}
@@ -122,11 +135,13 @@ function FeedbackTaskCard({
 export function ReviewsView({
   data,
   permissions,
-  currentUserId
+  currentUserId,
+  currentTeamId
 }: {
   data: ReviewsData;
   permissions: string[];
   currentUserId: string;
+  currentTeamId: string | null | undefined;
 }) {
   const { t } = useI18n();
   const router = useRouter();
@@ -237,6 +252,7 @@ export function ReviewsView({
                 key={feedback.id}
                 feedback={feedback}
                 currentUserId={currentUserId}
+                currentTeamId={currentTeamId}
                 permissions={permissions}
                 run={run}
               />
@@ -339,6 +355,7 @@ export function ReviewsView({
                   key={feedback.id}
                   feedback={feedback}
                   currentUserId={currentUserId}
+                  currentTeamId={currentTeamId}
                   permissions={permissions}
                   run={run}
                 />
@@ -361,6 +378,7 @@ export function ReviewsView({
                   key={feedback.id}
                   feedback={feedback}
                   currentUserId={currentUserId}
+                  currentTeamId={currentTeamId}
                   permissions={permissions}
                   run={run}
                 />
@@ -380,6 +398,7 @@ export function ReviewsView({
               key={feedback.id}
               feedback={feedback}
               currentUserId={currentUserId}
+              currentTeamId={currentTeamId}
               permissions={permissions}
               run={run}
             />
