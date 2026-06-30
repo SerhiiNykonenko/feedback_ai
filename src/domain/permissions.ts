@@ -58,6 +58,11 @@ export const PERMISSIONS = [
     name: "Read notifications",
     description: "View in-app notifications."
   },
+  {
+    key: "assistant.use",
+    name: "Use AI assistant",
+    description: "Ask the local AI assistant how to use the feedback system."
+  },
   { key: "search.global", name: "Use global search", description: "Search authorized entities." },
   { key: "settings.manage.users", name: "Manage users", description: "Manage users and teams." },
   { key: "settings.manage.products", name: "Manage products", description: "Manage products." },
@@ -80,6 +85,7 @@ const employeePermissions = [
   "feedback.read.own",
   "analytics.read.employee",
   "notifications.read",
+  "assistant.use",
   "search.global"
 ] satisfies PermissionKey[];
 

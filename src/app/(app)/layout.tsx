@@ -27,6 +27,7 @@ export default async function AuthenticatedLayout({ children }: { children: Reac
         <AppHeader
           logoutAction={logoutAction}
           unreadNotificationCount={unreadNotificationCount}
+          assistantEnabled={user.permissions.includes("assistant.use")}
         />
         <main className="mx-auto w-full max-w-7xl px-4 py-6 lg:px-6">{children}</main>
       </div>

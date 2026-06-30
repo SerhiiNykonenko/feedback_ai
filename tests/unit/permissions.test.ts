@@ -5,6 +5,7 @@ import { navigationItems } from "@/domain/navigation";
 describe("role permissions", () => {
   it("allows employees to work with their own feedback but not org settings", () => {
     expect(roleHasPermission("employee", "feedback.submit")).toBe(true);
+    expect(roleHasPermission("employee", "assistant.use")).toBe(true);
     expect(roleHasPermission("employee", "settings.manage.users")).toBe(false);
   });
 
